@@ -1,0 +1,42 @@
+<div class="row mt-5">
+  <div class="row">
+    <%= form_with url: weather_report_path, method: :get, local: true do |form| %>
+      <div class="mb-3 row">
+        <%= form.label "Zip Code:", class: "col-sm-1 col-form-label" %>
+        <div class="col-sm-2">
+          <%= form.text_field :zip_code, value: @zip_code, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <%= form.submit "Search", name: "", class: "btn btn-info" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="row">
+    <small><%= @error %></small><br>
+    <% if @weather_report.present? %>
+      <p>Location: <%= @weather_report["location"]["name"]%></p>
+      <p>Current Temperature: <%= "#{@weather_report["data"]["values"]["temperature"]} C"%></p>
+      <h5>Weekly Forecast:</h5>
+        <div class="row">
+          <% @weather_report["daily_timelines"].each do |timeline| %>
+            <div class="col-sm-2">
+              <div class="card p-2 bg-light">
+                <%= to_datetime_format(timeline["day"] )%></br>
+                Max Temp: <%= "#{timeline["temperatureMax"]} C" %><br>
+                Min Temp: <%= "#{timeline["temperatureMin"]} C" %><br>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div class="row p-4">
+          <%= "Last updated #{pluralize(@cached_at.to_i, 'minute')} ago" if @cached_at.present? %>
+          <br>
+          <%= "Next update in #{pluralize(@next_update.to_i, 'minute')}" if @next_update.present? %>
+        </div>
+    <% end %>
+    <small class="text-muted">API referrence: https://docs.tomorrow.io/reference/weather-forecast</small>
+  </div>
+</div>
